@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Experiment 1 - Building E-commerce Chatbot</title>
+<style>
+    @page {
+        size: A4;
+        margin: 18mm 15mm;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #222;
+        line-height: 1.45;
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .header-box {
+        border: 2px solid #000;
+        width: 100%;
+        margin-bottom: 22px;
+        border-collapse: collapse;
+    }
+    .header-box td {
+        padding: 10px 14px;
+        border: 1px solid #000;
+        font-size: 15px;
+    }
+    .header-title {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+    }
+    h3 {
+        margin-top: 18px;
+        margin-bottom: 6px;
+        font-size: 15px;
+        text-transform: uppercase;
+        border-bottom: 1.5px solid #333;
+        padding-bottom: 3px;
+        color: #111;
+    }
+    p, li {
+        font-size: 13.5px;
+        text-align: justify;
+    }
+    table.data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0 16px 0;
+        font-size: 13px;
+    }
+    table.data-table th, table.data-table td {
+        border: 1px solid #333;
+        padding: 7px 10px;
+        text-align: left;
+    }
+    table.data-table th {
+        background-color: #f2f2f2;
+        font-weight: 600;
+    }
+    .code-box {
+        background-color: #f8f9fa;
+        border: 1px solid #ccc;
+        border-left: 4px solid #1E88E5;
+        padding: 10px 12px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.35;
+        white-space: pre-wrap;
+        margin: 8px 0 14px 0;
+        border-radius: 3px;
+    }
+    .diagram-box {
+        border: 1px dashed #666;
+        background-color: #fafafa;
+        padding: 12px;
+        text-align: center;
+        margin: 10px 0 16px 0;
+        font-size: 13px;
+    }
+    .result-box {
+        background-color: #f0f7f0;
+        border: 1px solid #2e7d32;
+        padding: 10px 14px;
+        margin-top: 20px;
+        font-size: 13.5px;
+        border-radius: 4px;
+    }
+    .badge {
+        font-weight: bold;
+        color: #0d47a1;
+    }
+</style>
+</head>
+<body>
+
+<table class="header-box">
+    <tr>
+        <td style="width: 25%;"><strong>Ex. No.: 1</strong><br><br><strong>DATE:</strong> &lt;DATE&gt;</td>
+        <td class="header-title" style="width: 50%;">Building E-commerce Chatbot</td>
+        <td style="width: 25%; text-align: right;"><strong>REG. NO:</strong> &lt;REG. NO&gt;</td>
+    </tr>
+</table>
+
+<h3>Aim:</h3>
+<p>To build an AI-powered E-Commerce Chatbot using Retrieval-Augmented Generation (RAG) with Ollama.</p>
+
+<h3>Problem Statement:</h3>
+<p>Design and develop a modular Retrieval-Augmented Generation (RAG) based e-commerce chatbot using Ollama. The chatbot should answer FAQs, recommend products, answer product-specific questions, summarize customer reviews, and intelligently route user queries using an LLM-based intent detector.</p>
+
+<h3>Software Requirements:</h3>
+<table class="data-table">
+    <tr>
+        <th style="width: 45%;">Software</th>
+        <th style="width: 55%;">Version</th>
+    </tr>
+    <tr>
+        <td>Python</td>
+        <td>3.11.9</td>
+    </tr>
+    <tr>
+        <td>Ollama</td>
+        <td>0.3.14 (Model: Qwen2:0.5b / Qwen)</td>
+    </tr>
+    <tr>
+        <td>VS Code</td>
+        <td>1.94.0</td>
+    </tr>
+    <tr>
+        <td>Pandas</td>
+        <td>3.1.0</td>
+    </tr>
+    <tr>
+        <td>Sentence Transformers / Scikit-Learn</td>
+        <td>1.9.1</td>
+    </tr>
+</table>
+
+<h3>Dataset Description:</h3>
+<table class="data-table">
+    <tr>
+        <th style="width: 25%;">Dataset</th>
+        <th style="width: 75%;">Purpose</th>
+    </tr>
+    <tr>
+        <td><strong>Products</strong></td>
+        <td>Contains information about products (Product ID, Product Name, Brand, Category, Price, and Specifications). This dataset helps the chatbot answer product-related queries and execute TF-IDF feature recommendations.</td>
+    </tr>
+    <tr>
+        <td><strong>FAQs</strong></td>
+        <td>Contains frequently asked questions and verified answers regarding shipping, order tracking, cancellation, returns, refunds, payment methods, and warranty.</td>
+    </tr>
+    <tr>
+        <td><strong>Reviews</strong></td>
+        <td>Contains customer opinions and ratings across various product categories used for sentiment analysis (Positive, Negative, Neutral) and customer consensus summarization.</td>
+    </tr>
+</table>
+
+<h3>System Architecture:</h3>
+<div class="diagram-box">
+    <strong>System Flow Architecture Diagram</strong><br><br>
+    [User Query] &rarr; [Intent Classification Engine (Ollama Qwen / Rules)]<br>
+    &darr;<br>
+    &bull; <strong>FAQ Intent</strong> &rarr; [Semantic Search Engine (Embeddings & Cosine Similarity)] &rarr; [FAQ Answer]<br>
+    &bull; <strong>Recommendation Intent</strong> &rarr; [TF-IDF Keyword & Price Filter Engine] &rarr; [Ranked Products]<br>
+    &bull; <strong>Product QA Intent</strong> &rarr; [RAG Context Specs Retrieval + Qwen LLM] &rarr; [Technical Answer]<br>
+    &bull; <strong>Sentiment Intent</strong> &rarr; [Customer Review Mining & Sentiment Scoring] &rarr; [Consensus Breakdown]<br>
+    &darr;<br>
+    [Unified Chatbot Pipeline] &rarr; [Display Response to User]
+</div>
+
+<h3>Module Design:</h3>
+<table class="data-table">
+    <tr>
+        <th style="width: 30%;">Module</th>
+        <th style="width: 70%;">Responsibility</th>
+    </tr>
+    <tr>
+        <td><strong>FAQ Module</strong></td>
+        <td>Encodes questions into vector embeddings and performs Cosine Similarity search against pre-stored FAQ vectors to retrieve answers to paraphrased customer queries.</td>
+    </tr>
+    <tr>
+        <td><strong>Recommendation Module</strong></td>
+        <td>Computes TF-IDF term weights from product specifications, filters by price budget constraints, and ranks matching products by cosine similarity.</td>
+    </tr>
+    <tr>
+        <td><strong>Product Module</strong></td>
+        <td>Implements Retrieval-Augmented Generation (RAG) by retrieving exact product specifications and generating natural language answers using local Qwen.</td>
+    </tr>
+    <tr>
+        <td><strong>Review Module</strong></td>
+        <td>Analyzes customer reviews, categorizes feedback into positive, negative, and neutral polarities, and calculates overall consumer consensus.</td>
+    </tr>
+    <tr>
+        <td><strong>Intent Module</strong></td>
+        <td>Classifies incoming user queries into FAQ, Product Recommendation, Product QA, or Sentiment Analysis intents.</td>
+    </tr>
+    <tr>
+        <td><strong>Chatbot</strong></td>
+        <td>Central orchestrator coordinating data flow between sub-modules, error handling, session persistence, and UI rendering.</td>
+    </tr>
+</table>
+
+<h3>Implementation:</h3>
+<p>
+<strong>GitHub Link:</strong> <a href="https://github.com/Sarjin744/ecommerce-ai-chatbot-rag" target="_blank">https://github.com/Sarjin744/ecommerce-ai-chatbot-rag</a><br>
+<strong>LinkedIn Post Link:</strong> &lt;LinkedIn Post Link&gt; <em>(e.g., https://linkedin.com/in/your-profile/posts/...)</em>
+</p>
+
+<h3>Output Screenshots / Execution Demonstration:</h3>
+
+<p class="badge">1. Intent Detection:</p>
+<div class="code-box">Query: "Recommend a gaming laptop under 145000"
+&rarr; Identified Intent: PRODUCT_RECOMMENDATION (Confidence: 90.0% | Source: Rule Engine)
+
+Query: "Is this phone waterproof?"
+&rarr; Identified Intent: PRODUCT_QA (Confidence: 88.0% | Source: Rule Engine)
+
+Query: "Where is my parcel?"
+&rarr; Identified Intent: FAQ (Confidence: 94.0% | Source: Rule Engine)
+
+Query: "What do customers think about Laptop?"
+&rarr; Identified Intent: SENTIMENT_ANALYSIS (Confidence: 95.0% | Source: Rule Engine)</div>
+
+<p class="badge">2. FAQ Module (Semantic Search & Cosine Similarity):</p>
+<div class="code-box">User Query: "Where is my parcel?"
+Matched FAQ Question: "Where is my parcel?" / "How do I track my order?"
+Cosine Similarity Score: 1.0000
+Answer: "Your parcel status and live location are updated under My Orders section. You can check expected delivery date there."</div>
+
+<p class="badge">3. Recommendation Module (TF-IDF & Price Filter):</p>
+<div class="code-box">User Query: "Recommend a gaming laptop under 145000"
+Extracted TF-IDF Keywords: gaming, laptop, 145000 | Applied Filter: Price &lt;= Rs. 145,000.00
+Top Recommendations:
+1. Predator Helios 16 Gaming Laptop (Acer) - Rs. 139,999.00 | Similarity Score: 0.3283
+   Specs: Intel Core i7 13th Gen, 16GB DDR5 RAM, 1TB NVMe SSD, NVIDIA RTX 4060.
+2. Dell Inspiron 15 Office Laptop (Dell) - Rs. 54,990.00 | Similarity Score: 0.0794</div>
+
+<p class="badge">4. Product QA Module (RAG Context + Local LLM Qwen):</p>
+<div class="code-box">User Query: "Is this phone waterproof?"
+Product Retrieved: Redmi Note 13 Pro (Xiaomi)
+Answer: "The Redmi Note 13 Pro comes with an IP54 splash resistance rating, meaning it can withstand light splashes of water, but is not fully waterproof."</div>
+
+<p class="badge">5. Review Summary Module (Customer Sentiment Analysis):</p>
+<div class="code-box">User Query: "What do customers think about Laptop?"
+Target Product: Predator Helios 16 Gaming Laptop
+Sentiment Breakdown:
+- Positive Sentiment: 50.0% (2 reviews)
+- Negative Sentiment: 50.0% (2 reviews)
+- Neutral Sentiment:  0.0% (0 reviews)
+Consensus Verdict: Mixed / Neutral ⚖️
+Summary: Strong praise for 165Hz QHD display and RTX gaming performance, with feedback noting fan noise and thermals under heavy loads.</div>
+
+<div class="result-box">
+<strong>Result:</strong><br>
+Thus successfully built a local chatbot system that can answer product-related questions from a dataset, recommend products based on similarity, analyze sentiment from user/product reviews, and simulate FAQ responses using Ollama.
+</div>
+
+</body>
+</html>
